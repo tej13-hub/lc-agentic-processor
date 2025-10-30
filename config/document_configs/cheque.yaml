@@ -1,0 +1,90 @@
+document_type: cheque
+category: financial
+version: "1.0"
+description: "Bank Cheque"
+
+fields:
+  - name: bank_name
+    type: string
+    required: true
+    description: "Bank name"
+    
+  - name: bank_address
+    type: string
+    required: false
+    description: "Bank address"
+    
+  - name: cheque_number
+    type: string
+    required: false
+    description: "Cheque number"
+    
+  - name: date
+    type: date
+    required: true
+    description: "Cheque date"
+    format: "YYYY-MM-DD"
+    
+  - name: valid_up_to
+    type: date
+    required: false
+    description: "Valid up to date"
+    format: "YYYY-MM-DD"
+    
+  - name: amount
+    type: currency
+    required: true
+    description: "Cheque amount"
+    
+  - name: account_number
+    type: string
+    required: false
+    description: "Account number"
+    
+  - name: pay_to
+    type: string
+    required: true
+    description: "Pay to (payee name)"
+    
+  - name: bearer
+    type: string
+    required: false
+    description: "Bearer information"
+
+extraction_prompt: |
+  Extract information from this Cheque:
+  
+  REQUIRED:
+  1. Bank Name
+  2. Date
+  3. Amount
+  4. Pay to (Payee)
+  
+  OPTIONAL:
+  5. Bank Address
+  6. Cheque Number
+  7. Valid up to date
+  8. Account Number
+  9. Bearer
+  
+  TEXT:
+  {text}
+  
+  Return JSON:
+  {
+    "bank_name": "string or null",
+    "bank_address": "string or null",
+    "cheque_number": "string or null",
+    "date": "YYYY-MM-DD or null",
+    "valid_up_to": "YYYY-MM-DD or null",
+    "amount": "number or null",
+    "account_number": "string or null",
+    "pay_to": "string or null",
+    "bearer": "string or null"
+  }
+
+validation:
+  - field: bank_name
+    rule: not_empty
+  - field: amount
+    rule: is_numeric

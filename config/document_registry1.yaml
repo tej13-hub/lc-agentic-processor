@@ -1,0 +1,299 @@
+# Document Registry - All 51 Document Types
+# Last Updated: 2025-10-16
+# Version: 1.0
+
+documents:
+  # ============================================================
+  # FINANCIAL DOCUMENTS (4 total, 4 with extraction)
+  # ============================================================
+  
+  - type: bill_of_exchange
+    category: financial
+    extract: true
+    extractor_class: BillOfExchangeExtractor
+    config_file: bill_of_exchange.yaml
+    description: "Bill of exchange payment instrument"
+  
+  - type: draft
+    category: financial
+    extract: true
+    extractor_class: DraftExtractor
+    config_file: draft.yaml
+    description: "Draft payment instrument"
+  
+  - type: cheque
+    category: financial
+    extract: true
+    extractor_class: ChequeExtractor
+    config_file: cheque.yaml
+    description: "Bank cheque"
+  
+  - type: demand_draft
+    category: financial
+    extract: true
+    extractor_class: DemandDraftExtractor
+    config_file: demand_draft.yaml
+    description: "Bank demand draft"
+  
+  # ============================================================
+  # COMMERCIAL DOCUMENTS (32 total, 3 with extraction)
+  # ============================================================
+  
+  - type: purchase_order
+    category: commercial
+    extract: true
+    extractor_class: PurchaseOrderExtractor
+    config_file: purchase_order.yaml
+    description: "Purchase order for goods/services"
+  
+  - type: proforma_invoice
+    category: commercial
+    extract: true
+    extractor_class: ProformaInvoiceExtractor
+    config_file: proforma_invoice.yaml
+    description: "Proforma invoice"
+  
+  - type: commercial_invoice
+    category: commercial
+    extract: true
+    extractor_class: CommercialInvoiceExtractor
+    config_file: commercial_invoice.yaml
+    description: "Commercial invoice for international trade"
+  
+  # Commercial - Classification Only
+  - type: tax_invoice
+    category: commercial
+    extract: false
+    description: "Tax invoice"
+  
+  - type: debit_note
+    category: commercial
+    extract: false
+    description: "Debit note"
+  
+  - type: credit_note
+    category: commercial
+    extract: false
+    description: "Credit note"
+  
+  - type: cash_memo
+    category: commercial
+    extract: false
+    description: "Cash memo"
+  
+  - type: mt103_swift
+    category: commercial
+    extract: false
+    description: "MT103 SWIFT message"
+  
+  - type: mt202_swift
+    category: commercial
+    extract: false
+    description: "MT202 SWIFT message"
+  
+  - type: packing_list
+    category: commercial
+    extract: false
+    description: "Packing list"
+  
+  - type: weight_list
+    category: commercial
+    extract: false
+    description: "Weight list"
+  
+  - type: contract
+    category: commercial
+    extract: false
+    description: "Commercial contract"
+  
+  - type: certificate_of_origin
+    category: commercial
+    extract: false
+    description: "Certificate of origin"
+  
+  - type: gsp_certificate
+    category: commercial
+    extract: false
+    description: "Generalized System of Preferences certificate"
+  
+  - type: inspection_certificate
+    category: commercial
+    extract: false
+    description: "Inspection certificate"
+  
+  - type: fumigation_certificate
+    category: commercial
+    extract: false
+    description: "Fumigation certificate"
+  
+  - type: warranty_certificate
+    category: commercial
+    extract: false
+    description: "Warranty certificate"
+  
+  - type: certificate_of_analysis
+    category: commercial
+    extract: false
+    description: "Certificate of analysis"
+  
+  - type: certificate_of_quality
+    category: commercial
+    extract: false
+    description: "Certificate of quality"
+  
+  - type: phytosanitary_certificate
+    category: commercial
+    extract: false
+    description: "Phytosanitary certificate"
+  
+  - type: iec_code_certificate
+    category: commercial
+    extract: false
+    description: "IEC code certificate"
+  
+  - type: shipping_bill
+    category: commercial
+    extract: false
+    description: "Shipping bill"
+  
+  - type: bill_of_entry
+    category: commercial
+    extract: false
+    description: "Bill of entry"
+  
+  - type: export_import_license
+    category: commercial
+    extract: false
+    description: "Export/Import license"
+  
+  - type: sdf_form
+    category: commercial
+    extract: false
+    description: "Statutory Declaration Form"
+  
+  - type: softex
+    category: commercial
+    extract: false
+    description: "Software Export Declaration"
+  
+  - type: high_seas_agreement
+    category: commercial
+    extract: false
+    description: "High seas agreement"
+  
+  - type: shipping_guarantee
+    category: commercial
+    extract: false
+    description: "Shipping guarantee"
+  
+  - type: sales_agreement
+    category: commercial
+    extract: false
+    description: "Sales agreement"
+  
+  - type: promissory_note
+    category: commercial
+    extract: false
+    description: "Promissory note"
+  
+  - type: gr_waiver
+    category: commercial
+    extract: false
+    description: "General Remittance Waiver"
+  
+  # ============================================================
+  # TRANSPORT DOCUMENTS (10 total, 0 with extraction)
+  # ============================================================
+  
+  - type: bill_of_lading
+    category: transport
+    extract: false
+    description: "Bill of lading"
+  
+  - type: airway_bill
+    category: transport
+    extract: false
+    description: "Airway bill"
+  
+  - type: multimodal_transport_document
+    category: transport
+    extract: false
+    description: "Multimodal/Combined transport document"
+  
+  - type: lorry_receipt
+    category: transport
+    extract: false
+    description: "Lorry receipt"
+  
+  - type: cmr
+    category: transport
+    extract: false
+    description: "CMR - Convention on International Carriage of Goods by Road"
+  
+  - type: delivery_note
+    category: transport
+    extract: false
+    description: "Delivery note"
+  
+  - type: courier_receipt
+    category: transport
+    extract: false
+    description: "Courier receipt"
+  
+  - type: postal_receipt
+    category: transport
+    extract: false
+    description: "Postal receipt"
+  
+  - type: seaway_bill
+    category: transport
+    extract: false
+    description: "Seaway bill"
+  
+  # ============================================================
+  # INSURANCE DOCUMENTS (6 total, 0 with extraction)
+  # ============================================================
+  
+  - type: insurance_policy
+    category: insurance
+    extract: false
+    description: "Insurance policy"
+  
+  - type: insurance_certificate
+    category: insurance
+    extract: false
+    description: "Insurance certificate"
+  
+  - type: consignment_advice_insurance
+    category: insurance
+    extract: false
+    description: "Consignment advice for insurance"
+  
+  - type: cover_note
+    category: insurance
+    extract: false
+    description: "Insurance cover note"
+  
+  - type: marine_insurance
+    category: insurance
+    extract: false
+    description: "Marine insurance"
+  
+  - type: cargo_insurance
+    category: insurance
+    extract: false
+    description: "Cargo insurance"
+  
+  - type: customs_bond
+    category: insurance
+    extract: false
+    description: "Customs bond"
+  
+  # ============================================================
+  # FALLBACK
+  # ============================================================
+  
+  - type: other
+    category: unknown
+    extract: false
+    description: "Unrecognized or uncategorized document"

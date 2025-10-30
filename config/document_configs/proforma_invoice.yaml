@@ -1,0 +1,139 @@
+document_type: proforma_invoice
+category: commercial
+version: "1.0"
+description: "Proforma Invoice"
+
+fields:
+  - name: invoice_number
+    type: string
+    required: true
+    description: "Proforma Invoice number"
+    
+  - name: date
+    type: date
+    required: true
+    description: "Invoice date"
+    
+  - name: bill_to_name
+    type: string
+    required: true
+    description: "Bill to name"
+    
+  - name: bill_to_address
+    type: string
+    required: false
+    description: "Bill to address"
+    
+  - name: ship_to_name
+    type: string
+    required: false
+    description: "Ship to name"
+    
+  - name: ship_to_address
+    type: string
+    required: false
+    description: "Ship to address"
+    
+  - name: seller
+    type: string
+    required: true
+    description: "Seller/Exporter name"
+    
+  - name: buyer
+    type: string
+    required: true
+    description: "Buyer/Importer name"
+    
+  - name: delivery_date
+    type: date
+    required: false
+    description: "Expected delivery date"
+    
+  - name: method_of_dispatch
+    type: string
+    required: false
+    description: "Method of dispatch"
+    
+  - name: port_of_loading
+    type: string
+    required: false
+    description: "Port of loading"
+    
+  - name: port_of_discharge
+    type: string
+    required: false
+    description: "Port of discharge"
+    
+  - name: dispatch_from
+    type: string
+    required: false
+    description: "Dispatch from location"
+    
+  - name: delivery_place
+    type: string
+    required: false
+    description: "Delivery place"
+    
+  - name: incoterms
+    type: string
+    required: false
+    description: "Incoterms"
+    
+  - name: payment_terms
+    type: string
+    required: false
+    description: "Payment terms"
+    
+  - name: items
+    type: array
+    required: true
+    description: "Array of items"
+    
+  - name: subtotal
+    type: currency
+    required: false
+    
+  - name: tax_rate
+    type: number
+    required: false
+    
+  - name: shipping_cost
+    type: currency
+    required: false
+    
+  - name: total_amount
+    type: currency
+    required: true
+
+extraction_prompt: |
+  Extract from Proforma Invoice:
+  
+  HEADER:
+  - Invoice Number, Date
+  - Seller, Buyer
+  - Bill To, Ship To (names & addresses)
+  
+  SHIPPING:
+  - Method of Dispatch
+  - Port of Loading/Discharge
+  - Dispatch From, Delivery Place
+  - Delivery Date
+  
+  TERMS:
+  - Incoterms
+  - Payment Terms
+  
+  ITEMS (array):
+  - product_code, description, quantity, weight, unit_price, total
+  
+  TOTALS:
+  - Subtotal, Tax, Shipping, Total
+  
+  TEXT:
+  {text}
+  
+  Return JSON with all fields.
+
+validation:
+  - field: invoice_number
+    rule: not_empty

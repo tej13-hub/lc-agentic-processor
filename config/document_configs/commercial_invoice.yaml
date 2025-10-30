@@ -1,0 +1,139 @@
+document_type: commercial_invoice
+category: commercial
+version: "1.0"
+description: "Commercial Invoice for International Trade"
+
+fields:
+  - name: exporter_name
+    type: string
+    required: true
+    
+  - name: exporter_address
+    type: string
+    required: true
+    
+  - name: importer_name
+    type: string
+    required: true
+    
+  - name: importer_address
+    type: string
+    required: true
+    
+  - name: consignee
+    type: string
+    required: false
+    
+  - name: consignor
+    type: string
+    required: false
+    
+  - name: method_of_dispatch
+    type: string
+    required: false
+    
+  - name: type_of_shipment
+    type: string
+    required: false
+    
+  - name: country_of_origin
+    type: string
+    required: true
+    
+  - name: country_of_destination
+    type: string
+    required: true
+    
+  - name: vessel_aircraft
+    type: string
+    required: false
+    
+  - name: voyage_number
+    type: string
+    required: false
+    
+  - name: terms_of_payment
+    type: string
+    required: true
+    
+  - name: port_of_loading
+    type: string
+    required: true
+    
+  - name: port_of_discharge
+    type: string
+    required: true
+    
+  - name: place_of_dispatch
+    type: string
+    required: false
+    
+  - name: place_of_destination
+    type: string
+    required: false
+    
+  - name: marine_policy_number
+    type: string
+    required: false
+    
+  - name: letter_of_credit_number
+    type: string
+    required: false
+    
+  - name: incoterms
+    type: string
+    required: true
+    
+  - name: bank_details
+    type: string
+    required: false
+    
+  - name: items
+    type: array
+    required: true
+    description: "Array with product_code, description, hs_code, quantity, unit_type, price"
+    
+  - name: total_amount
+    type: currency
+    required: true
+
+extraction_prompt: |
+  Extract from Commercial Invoice:
+  
+  PARTIES:
+  - Exporter/Seller (name & address)
+  - Importer/Buyer (name & address)
+  - Consignee, Consignor
+  
+  SHIPMENT:
+  - Method of Dispatch, Type
+  - Country of Origin/Destination
+  - Vessel/Aircraft, Voyage Number
+  - Port of Loading/Discharge
+  - Place of Dispatch/Destination
+  
+  FINANCIAL:
+  - Terms of Payment
+  - Marine Policy Number
+  - LC Number
+  - Incoterms
+  - Bank Details
+  
+  ITEMS (array):
+  - product_code
+  - description
+  - hs_code
+  - quantity
+  - unit_type
+  - price
+  
+  TOTAL: Total Amount
+  
+  TEXT:
+  {text}
+  
+  Return complete JSON.
+
+validation:
+  - field: exporter_name
+    rule: not_empty

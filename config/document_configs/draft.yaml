@@ -1,0 +1,90 @@
+document_type: draft
+category: financial
+version: "1.0"
+description: "Draft - Payment instrument (similar to Bill of Exchange)"
+
+fields:
+  - name: draft_number
+    type: string
+    required: true
+    description: "Draft number or reference"
+    
+  - name: date
+    type: date
+    required: true
+    description: "Date of draft issuance"
+    format: "YYYY-MM-DD"
+    
+  - name: place
+    type: string
+    required: false
+    description: "Place where draft was drawn"
+    
+  - name: amount
+    type: currency
+    required: true
+    description: "Draft amount"
+    
+  - name: tenor
+    type: string
+    required: false
+    description: "Payment tenor"
+    
+  - name: due_date
+    type: date
+    required: true
+    description: "Due or maturity date"
+    format: "YYYY-MM-DD"
+    
+  - name: drawn_on
+    type: string
+    required: true
+    description: "Party on whom draft is drawn"
+    
+  - name: drawee
+    type: string
+    required: true
+    description: "Drawee name and details"
+    
+  - name: signature_present
+    type: boolean
+    required: false
+    description: "Whether signature is present"
+
+extraction_prompt: |
+  Extract the following information from this Draft document:
+  
+  REQUIRED FIELDS:
+  1. Draft Number/Reference
+  2. Date of issuance
+  3. Amount (with currency)
+  4. Due/Maturity Date
+  5. Drawn on (party)
+  6. Drawee information
+  
+  OPTIONAL FIELDS:
+  7. Place
+  8. Tenor
+  9. Signature present
+  
+  TEXT:
+  {text}
+  
+  Return ONLY valid JSON:
+  {
+    "draft_number": "string or null",
+    "date": "YYYY-MM-DD or null",
+    "place": "string or null",
+    "amount": "number or null",
+    "tenor": "string or null",
+    "due_date": "YYYY-MM-DD or null",
+    "drawn_on": "string or null",
+    "drawee": "string or null",
+    "signature_present": true/false/null
+  }
+
+validation:
+  - field: draft_number
+    rule: not_empty
+  - field: amount
+    rule: is_numeric

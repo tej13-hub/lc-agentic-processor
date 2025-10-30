@@ -1,0 +1,158 @@
+document_type: purchase_order
+category: commercial
+version: "1.0"
+description: "Purchase Order"
+
+fields:
+  - name: po_number
+    type: string
+    required: true
+    description: "Purchase Order number (PO or P.O.)"
+    
+  - name: date
+    type: date
+    required: true
+    description: "PO date"
+    format: "YYYY-MM-DD"
+    
+  - name: vendor_name
+    type: string
+    required: true
+    description: "Vendor/Supplier name"
+    
+  - name: vendor_address
+    type: string
+    required: false
+    description: "Vendor address"
+    
+  - name: ship_to_name
+    type: string
+    required: false
+    description: "Ship to name"
+    
+  - name: ship_to_address
+    type: string
+    required: false
+    description: "Ship to address"
+    
+  - name: shipping_terms
+    type: string
+    required: false
+    description: "Shipping terms"
+    
+  - name: shipping_method
+    type: string
+    required: false
+    description: "Shipping method"
+    
+  - name: delivery_date
+    type: date
+    required: false
+    description: "Expected delivery date"
+    format: "YYYY-MM-DD"
+    
+  - name: items
+    type: array
+    required: true
+    description: "Array of items with description, qty, unit_price, weight, total"
+    
+  - name: subtotal
+    type: currency
+    required: false
+    description: "Subtotal amount"
+    
+  - name: tax_rate
+    type: number
+    required: false
+    description: "Tax rate percentage"
+    
+  - name: tax_total
+    type: currency
+    required: false
+    description: "Total tax amount"
+    
+  - name: shipping_cost
+    type: currency
+    required: false
+    description: "Shipping cost"
+    
+  - name: total_amount
+    type: currency
+    required: true
+    description: "Total PO amount"
+    
+  - name: incoterms
+    type: string
+    required: false
+    description: "Incoterms (FOB, CIF, etc.)"
+    
+  - name: payment_terms
+    type: string
+    required: false
+    description: "Payment terms"
+
+extraction_prompt: |
+  Extract from Purchase Order:
+  
+  HEADER:
+  1. PO Number
+  2. Date
+  3. Vendor (name & address)
+  4. Ship To (name & address)
+  5. Delivery Date
+  
+  TERMS:
+  6. Shipping Terms/Method
+  7. Incoterms
+  8. Payment Terms
+  
+  LINE ITEMS (extract as array):
+  - description
+  - quantity
+  - unit_price
+  - weight
+  - total
+  
+  TOTALS:
+  9. Subtotal
+  10. Tax Rate & Tax Total
+  11. Shipping Cost
+  12. Total Amount
+  
+  TEXT:
+  {text}
+  
+  Return JSON:
+  {
+    "po_number": "string",
+    "date": "YYYY-MM-DD",
+    "vendor_name": "string",
+    "vendor_address": "string",
+    "ship_to_name": "string",
+    "ship_to_address": "string",
+    "shipping_terms": "string",
+    "shipping_method": "string",
+    "delivery_date": "YYYY-MM-DD",
+    "items": [
+      {
+        "description": "string",
+        "quantity": number,
+        "unit_price": number,
+        "weight": "string",
+        "total": number
+      }
+    ],
+    "subtotal": number,
+    "tax_rate": number,
+    "tax_total": number,
+    "shipping_cost": number,
+    "total_amount": number,
+    "incoterms": "string",
+    "payment_terms": "string"
+  }
+
+validation:
+  - field: po_number
+    rule: not_empty
+  - field: total_amount
+    rule: is_numeric

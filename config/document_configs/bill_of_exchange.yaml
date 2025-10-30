@@ -1,0 +1,104 @@
+document_type: bill_of_exchange
+category: financial
+version: "1.0"
+description: "Bill of Exchange - Payment instrument"
+
+fields:
+  - name: bill_number
+    type: string
+    required: true
+    description: "Bill of Exchange number or reference"
+    patterns:
+      - "Bill No"
+      - "Bill Number"
+      - "Reference"
+    
+  - name: date
+    type: date
+    required: true
+    description: "Date of bill issuance"
+    format: "YYYY-MM-DD"
+    
+  - name: place
+    type: string
+    required: false
+    description: "Place where bill was drawn"
+    
+  - name: amount
+    type: currency
+    required: true
+    description: "Bill amount with currency"
+    
+  - name: tenor
+    type: string
+    required: false
+    description: "Payment tenor (at sight, 30 days, 60 days, etc.)"
+    
+  - name: due_date
+    type: date
+    required: true
+    description: "Due date or maturity date"
+    format: "YYYY-MM-DD"
+    
+  - name: drawn_on
+    type: string
+    required: true
+    description: "Party on whom the bill is drawn"
+    
+  - name: drawee
+    type: string
+    required: true
+    description: "Drawee name and details"
+    
+  - name: signature_present
+    type: boolean
+    required: false
+    description: "Whether signature is present or signatory name"
+
+extraction_prompt: |
+  Extract the following information from this Bill of Exchange document:
+  
+  REQUIRED FIELDS:
+  1. Bill Number/Reference
+  2. Date of issuance
+  3. Amount (with currency code if available)
+  4. Due/Maturity Date
+  5. Drawn on (party name)
+  6. Drawee information
+  
+  OPTIONAL FIELDS:
+  7. Place where drawn
+  8. Tenor (payment terms like "at sight", "30 days")
+  9. Signature status (true/false if signature present)
+  
+  TEXT:
+  {text}
+  
+  Return ONLY valid JSON with these exact keys:
+  {
+    "bill_number": "string or null",
+    "date": "YYYY-MM-DD or null",
+    "place": "string or null",
+    "amount": "number or null",
+    "tenor": "string or null",
+    "due_date": "YYYY-MM-DD or null",
+    "drawn_on": "string or null",
+    "drawee": "string or null",
+    "signature_present": true/false/null
+  }
+  
+  Rules:
+  - Use null for missing values
+  - Dates in YYYY-MM-DD format
+  - Amount as number only (no currency symbols)
+  - Be precise and accurate
+
+validation:
+  - field: bill_number
+    rule: not_empty
+  - field: amount
+    rule: is_numeric
+  - field: date
+    rule: is_valid_date
+  - field: due_date
+    rule: is_valid_date

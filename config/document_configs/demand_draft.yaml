@@ -1,0 +1,101 @@
+document_type: demand_draft
+category: financial
+version: "1.0"
+description: "Bank Demand Draft"
+
+fields:
+  - name: bank_name
+    type: string
+    required: true
+    description: "Issuing bank name"
+    
+  - name: bank_address
+    type: string
+    required: false
+    description: "Bank address"
+    
+  - name: reference_number
+    type: string
+    required: true
+    description: "DD reference or serial number"
+    
+  - name: date
+    type: date
+    required: true
+    description: "DD issuance date"
+    format: "YYYY-MM-DD"
+    
+  - name: currency
+    type: string
+    required: true
+    description: "Currency code (USD, EUR, INR, etc.)"
+    
+  - name: amount
+    type: currency
+    required: true
+    description: "DD amount"
+    
+  - name: account_number
+    type: string
+    required: false
+    description: "Account number"
+    
+  - name: issuing_place
+    type: string
+    required: false
+    description: "Place of issue"
+    
+  - name: pay_to_order
+    type: string
+    required: true
+    description: "Pay to order of (beneficiary)"
+    
+  - name: on_demand
+    type: boolean
+    required: false
+    description: "Payable on demand (true/false)"
+    
+  - name: available_with
+    type: string
+    required: false
+    description: "Available with (paying bank/branch)"
+
+extraction_prompt: |
+  Extract from Demand Draft:
+  
+  REQUIRED:
+  1. Bank Name & Address
+  2. Reference Number
+  3. Date
+  4. Currency & Amount
+  5. Pay to order (beneficiary)
+  
+  OPTIONAL:
+  6. Account Number
+  7. Issuing Place
+  8. On Demand (true/false)
+  9. Available with
+  
+  TEXT:
+  {text}
+  
+  Return JSON:
+  {
+    "bank_name": "string or null",
+    "bank_address": "string or null",
+    "reference_number": "string or null",
+    "date": "YYYY-MM-DD or null",
+    "currency": "string or null",
+    "amount": "number or null",
+    "account_number": "string or null",
+    "issuing_place": "string or null",
+    "pay_to_order": "string or null",
+    "on_demand": true/false/null,
+    "available_with": "string or null"
+  }
+
+validation:
+  - field: reference_number
+    rule: not_empty
+  - field: amount
+    rule: is_numeric

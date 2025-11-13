@@ -1,0 +1,70 @@
+{
+  "document_id": "DOC-SAMPLE-001",
+  "document_type": "commercial_invoice",
+  "invoice_number": "INV-SAMPLE-001",
+  "amount": 10000.00,
+  "date": "2024-01-01",
+  "lc_number": "LC-SAMPLE-123",
+  "exporter": "Sample Exporter Inc",
+  "importer": "Sample Importer Ltd",
+  "currency": "USD",
+  "description": "Sample commercial transaction",
+  "parties": {
+    "shipper": {
+      "name": "Sample Shipper Company",
+      "address": "123 Shipper Street, City, Country",
+      "tax_id": "TAX-SHIP-123456",
+      "contact": {
+        "email": "shipper@example.com",
+        "phone": "+1-234-567-8900"
+      }
+    },
+    "consignee": {
+      "name": "Sample Consignee Company",
+      "address": "456 Consignee Avenue, City, Country",
+      "tax_id": "TAX-CONS-789012",
+      "contact": {
+        "email": "consignee@example.com",
+        "phone": "+1-987-654-3210"
+      }
+    }
+  },
+  "line_items": [
+    {
+      "item_id": "ITEM-001",
+      "description": "Sample Product A - High Quality",
+      "quantity": 100,
+      "unit_price": 50.00,
+      "total_price": 5000.00,
+      "hs_code": "1234.56.78",
+      "weight": 500.00,
+      "weight_unit": "kg"
+    },
+    {
+      "item_id": "ITEM-002",
+      "description": "Sample Product B - Premium Grade",
+      "quantity": 50,
+      "unit_price": 100.00,
+      "total_price": 5000.00,
+      "hs_code": "8765.43.21",
+      "weight": 300.00,
+      "weight_unit": "kg"
+    }
+  ],
+  "shipping_details": {
+    "port_of_loading": "Sample Port A",
+    "port_of_discharge": "Sample Port B",
+    "vessel_name": "Sample Vessel",
+    "voyage_number": "VOY-123",
+    "container_number": "CONT-456789",
+    "departure_date": "2024-02-01",
+    "arrival_date": "2024-02-15",
+    "freight_terms": "FOB"
+  },
+  "payment_terms": {
+    "method": "Letter of Credit",
+    "due_date": "2024-03-01",
+    "bank_name": "Sample International Bank",
+    "swift_code": "SAMPUS33XXX"
+  }
+}

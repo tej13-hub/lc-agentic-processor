@@ -1,0 +1,75 @@
+{
+  "document_id": "bill-of-exchange_doc_001",
+  "source_file": "bill-of-exchange",
+  "page_range": "1",
+  "status": "success",
+  "agent_decisions": {
+    "preprocessing": {
+      "decisions": {
+        "needs_brightness_adjustment": false,
+        "brightness_adjustment_level": 0,
+        "needs_denoising": true,
+        "denoising_strength": "low",
+        "needs_contrast_enhancement": true,
+        "contrast_method": "clahe",
+        "needs_skew_correction": true,
+        "needs_thresholding": false,
+        "threshold_method": "none",
+        "reasoning": "Conservative preprocessing: noise=118.1, contrast=27.4, skew=-90.00°",
+        "original_metrics": {
+          "brightness": 190.4142698208937,
+          "contrast": 27.43425031152574,
+          "sharpness": 308.2181969016954,
+          "noise_level": 118.0616730296672,
+          "skew_angle": -90.0,
+          "resolution": [
+            615,
+            1330
+          ]
+        }
+      },
+      "output": "output/bill-of-exchange_doc_001_preprocessed.png"
+    },
+    "ocr": {
+      "confidence": 0.9396703202148964,
+      "text_length": 422,
+      "llm_validation": "skipped_disabled",
+      "output": "output/bill-of-exchange_doc_001_ocr.txt"
+    },
+    "classification": {
+      "document_type": "bill_of_exchange",
+      "document_confidence": 0.95,
+      "reasoning": "Found keywords: pay to the order of, drawer, drawee, tenor"
+    },
+    "extraction": {
+      "bill_number": "MD-01",
+      "lc_number": null,
+      "lc_date": null,
+      "date": "2008-04-30",
+      "place": null,
+      "amount": 30804.7,
+      "tenor": null,
+      "due_date": "2008-04-30",
+      "drawn_on": "2008-01-28",
+      "drawee": "COMMERCIAL BANK, LTD.",
+      "signature_present": true
+    }
+  },
+  "final_output": {
+    "instrument_type": "LC",
+    "document_type": "bill_of_exchange",
+    "extracted_fields": {
+      "bill_number": "MD-01",
+      "lc_number": null,
+      "lc_date": null,
+      "date": "2008-04-30",
+      "place": null,
+      "amount": 30804.7,
+      "tenor": null,
+      "due_date": "2008-04-30",
+      "drawn_on": "2008-01-28",
+      "drawee": "COMMERCIAL BANK, LTD.",
+      "signature_present": true
+    }
+  }
+}

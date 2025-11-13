@@ -47,7 +47,8 @@ class LlamaClient:
             TimeoutError: If request times out
             Exception: For other errors
         """
-        timeout = timeout or self.default_timeout
+        # timeout = timeout or self.default_timeout
+        timeout = 300
         
         # Build request payload
         payload = {

@@ -1,10 +1,10 @@
-# Document Registry - Enhanced All-In-One Format
-# Last Updated: 2025-10-17
-# Version: 2.0 (Single Source of Truth)
+# Document Registry - Production Ready (All Documents with Extraction)
+# Last Updated: 2025-11-06
+# Version: 3.1 (Optimized Prompts)
 
 documents:
   # ============================================================
-  # FINANCIAL DOCUMENTS (4 total, 4 with extraction)
+  # FINANCIAL DOCUMENTS (4 total)
   # ============================================================
   
   - type: bill_of_exchange
@@ -15,52 +15,72 @@ documents:
       - name: bill_number
         type: string
         required: true
-        description: "Bill of Exchange number or reference"
+      - name: lc_number
+        type: string
+        required: false
+      - name: lc_date
+        type: date
+        required: false
       - name: date
         type: date
         required: true
-        description: "Date of bill issuance"
       - name: place
         type: string
         required: false
-        description: "Place where bill was drawn"
       - name: amount
         type: currency
         required: true
-        description: "Bill amount"
       - name: tenor
         type: string
         required: false
-        description: "Payment tenor (at sight, 30 days, etc.)"
       - name: due_date
         type: date
         required: true
-        description: "Due or maturity date"
       - name: drawn_on
         type: string
         required: true
-        description: "Party on whom the bill is drawn"
       - name: drawee
         type: string
         required: true
-        description: "Drawee name and details"
+      - name: drawer
+        type: string
+        required: false
+      - name: payee
+        type: string
+        required: false
       - name: signature_present
         type: boolean
         required: false
-        description: "Whether signature is present"
     extraction_prompt: |
-      Extract the following information from this Bill of Exchange:
+      Extract structured data from this Bill of Exchange document.
       
-      REQUIRED: Bill Number, Date, Amount, Due Date, Drawn On, Drawee
-      OPTIONAL: Place, Tenor, Signature Present
+      SEARCH FOR THESE KEYWORDS:
+      - Bill Number: "Bill No", "B/E No", "Reference"
+      - LC Number: "LC No", "L/C No", "Letter of Credit"
+      - Date: "Date", "Dated", "Issue Date"
+      - Amount: Dollar amounts, currency symbols
+      - Drawee: "Drawee", "Drawn on", Bank name
+      - Drawer: "Drawer", "Issued by"
       
-      TEXT:
+      DOCUMENT TEXT:
       {text}
       
-      Return ONLY valid JSON with these keys:
-      ["bill_number", "date", "place", "amount", "tenor", "due_date", "drawn_on", "drawee", "signature_present"]
-      
-      Use null for missing values. Dates in YYYY-MM-DD format.
+      Return ONLY this JSON (no other text):
+      {{
+        "bill_number": "value or null",
+        "lc_number": "value or null",
+        "lc_date": "YYYY-MM-DD or null",
+        "date": "YYYY-MM-DD or null",
+        "place": "value or null",
+        "amount": number or null,
+        "tenor": "value or null",
+        "due_date": "YYYY-MM-DD or null",
+        "drawn_on": "value or null",
+        "drawee": "value or null",
+        "drawer": "value or null",
+        "payee": "value or null",
+        "signature_present": true/false/null
+      }}
   
   - type: draft
     category: financial
@@ -70,34 +90,28 @@ documents:
       - name: draft_number
         type: string
         required: true
+      - name: lc_number
+        type: string
+        required: false
       - name: date
         type: date
         required: true
-      - name: place
-        type: string
-        required: false
       - name: amount
         type: currency
-        required: true
-      - name: tenor
-        type: string
-        required: false
-      - name: due_date
-        type: date
-        required: true
-      - name: drawn_on
-        type: string
         required: true
       - name: drawee
         type: string
         required: true
-      - name: signature_present
-        type: boolean
-        required: false
     extraction_prompt: |
-      Extract from this Draft: Draft Number, Date, Amount, Due Date, Drawn On, Drawee.
-      Optional: Place, Tenor, Signature.
-      Return JSON only with keys: ["draft_number", "date", "place", "amount", "tenor", "due_date", "drawn_on", "drawee", "signature_present"]
+      Extract from Draft document.
+      
+      KEYWORDS: "Draft No", "Date", "Amount", "Drawee", "LC No"
+      
+      TEXT:
+      {text}
+      
+      Return JSON only:
+      {{"draft_number": null, "lc_number": null, "date": null, "amount": null, "drawee": null}}
   
   - type: cheque
     category: financial
@@ -107,34 +121,28 @@ documents:
       - name: bank_name
         type: string
         required: true
-      - name: bank_address
-        type: string
-        required: false
       - name: cheque_number
         type: string
         required: false
       - name: date
         type: date
         required: true
-      - name: valid_up_to
-        type: date
-        required: false
       - name: amount
         type: currency
         required: true
-      - name: account_number
-        type: string
-        required: false
       - name: pay_to
         type: string
         required: true
-      - name: bearer
-        type: string
-        required: false
     extraction_prompt: |
-      Extract from Cheque: Bank Name, Date, Amount, Pay To.
-      Optional: Bank Address, Cheque Number, Valid Up To, Account Number, Bearer.
-      Return JSON: ["bank_name", "bank_address", "cheque_number", "date", "valid_up_to", "amount", "account_number", "pay_to", "bearer"]
+      Extract from Cheque.
+      
+      KEYWORDS: Bank name (top of cheque), Cheque number (6-digit), Date, Amount, "Pay to the order of"
+      
+      TEXT:
+      {text}
+      
+      JSON:
+      {{"bank_name": null, "cheque_number": null, "date": null, "amount": null, "pay_to": null}}
   
   - type: demand_draft
     category: financial
@@ -144,48 +152,34 @@ documents:
       - name: bank_name
         type: string
         required: true
-      - name: bank_address
-        type: string
-        required: false
       - name: reference_number
         type: string
         required: true
       - name: date
         type: date
         required: true
-      - name: currency
-        type: string
-        required: true
       - name: amount
         type: currency
         required: true
-      - name: account_number
-        type: string
-        required: false
-      - name: issuing_place
-        type: string
-        required: false
-      - name: pay_to_order
-        type: string
-        required: true
-      - name: on_demand
-        type: boolean
-        required: false
-      - name: available_with
-        type: string
-        required: false
     extraction_prompt: |
-      Extract from Demand Draft: Bank Name, Reference Number, Date, Currency, Amount, Pay To Order.
-      Return JSON: ["bank_name", "bank_address", "reference_number", "date", "currency", "amount", "account_number", "issuing_place", "pay_to_order", "on_demand", "available_with"]
+      Extract from Demand Draft.
+      
+      KEYWORDS: Bank name, DD number/Reference, Date, Amount
+      
+      TEXT:
+      {text}
+      
+      JSON:
+      {{"bank_name": null, "reference_number": null, "date": null, "amount": null}}
   
   # ============================================================
-  # COMMERCIAL DOCUMENTS (32 total, 3 with extraction)
+  # COMMERCIAL DOCUMENTS (32 total)
   # ============================================================
   
   - type: purchase_order
     category: commercial
     extract: true
-    description: "Purchase order for goods/services"
+    description: "Purchase order"
     fields:
       - name: po_number
         type: string
@@ -196,53 +190,19 @@ documents:
       - name: vendor_name
         type: string
         required: true
-      - name: vendor_address
-        type: string
-        required: false
-      - name: ship_to_name
-        type: string
-        required: false
-      - name: ship_to_address
-        type: string
-        required: false
-      - name: shipping_terms
-        type: string
-        required: false
-      - name: shipping_method
-        type: string
-        required: false
-      - name: delivery_date
-        type: date
-        required: false
-      - name: items
-        type: array
-        required: true
-        description: "Array of items"
-      - name: subtotal
-        type: currency
-        required: false
-      - name: tax_rate
-        type: number
-        required: false
-      - name: tax_total
-        type: currency
-        required: false
-      - name: shipping_cost
-        type: currency
-        required: false
       - name: total_amount
         type: currency
-        required: true
-      - name: incoterms
-        type: string
-        required: false
-      - name: payment_terms
-        type: string
         required: false
     extraction_prompt: |
-      Extract from Purchase Order: PO Number, Date, Vendor, Ship To, Delivery Date, Items (array), Total Amount.
-      Optional: Shipping Terms, Incoterms, Payment Terms.
-      Return JSON with all field names.
+      Extract from Purchase Order.
+      
+      KEYWORDS: "PO No", "Purchase Order", "Date", "Vendor", "Supplier", "Total"
+      
+      TEXT:
+      {text}
+      
+      JSON:
+      {{"po_number": null, "date": null, "vendor_name": null, "total_amount": null}}
   
   - type: proforma_invoice
     category: commercial
@@ -255,374 +215,1065 @@ documents:
       - name: date
         type: date
         required: true
-      - name: bill_to_name
-        type: string
-        required: true
-      - name: bill_to_address
-        type: string
-        required: false
-      - name: ship_to_name
-        type: string
-        required: false
-      - name: ship_to_address
-        type: string
-        required: false
       - name: seller
         type: string
         required: true
       - name: buyer
         type: string
         required: true
-      - name: delivery_date
-        type: date
-        required: false
-      - name: method_of_dispatch
-        type: string
-        required: false
-      - name: port_of_loading
-        type: string
-        required: false
-      - name: port_of_discharge
-        type: string
-        required: false
-      - name: dispatch_from
-        type: string
-        required: false
-      - name: delivery_place
-        type: string
-        required: false
-      - name: incoterms
-        type: string
-        required: false
-      - name: payment_terms
-        type: string
-        required: false
-      - name: items
-        type: array
-        required: true
-      - name: subtotal
-        type: currency
-        required: false
-      - name: tax_rate
-        type: number
-        required: false
-      - name: shipping_cost
-        type: currency
-        required: false
       - name: total_amount
         type: currency
-        required: true
+        required: false
     extraction_prompt: |
-      Extract from Proforma Invoice: Invoice Number, Date, Seller, Buyer, Items, Total Amount.
-      Return JSON with all fields.
+      Extract from Proforma Invoice.
+      
+      KEYWORDS: "Proforma Invoice", "Invoice No", "Date", "Seller", "Exporter", "Buyer", "Importer", "Total"
+      
+      TEXT:
+      {text}
+      
+      JSON:
+      {{"invoice_number": null, "date": null, "seller": null, "buyer": null, "total_amount": null}}
   
   - type: commercial_invoice
     category: commercial
     extract: true
-    description: "Commercial invoice for international trade"
+    description: "Commercial invoice"
     fields:
-      - name: exporter_name
+      - name: invoice_number
         type: string
         required: true
-      - name: exporter_address
+      - name: date
+        type: date
+        required: true
+      - name: exporter_name
         type: string
         required: true
       - name: importer_name
         type: string
         required: true
-      - name: importer_address
-        type: string
-        required: true
-      - name: consignee
-        type: string
-        required: false
-      - name: consignor
-        type: string
-        required: false
-      - name: method_of_dispatch
-        type: string
-        required: false
-      - name: type_of_shipment
-        type: string
-        required: false
-      - name: country_of_origin
-        type: string
-        required: true
-      - name: country_of_destination
-        type: string
-        required: true
-      - name: vessel_aircraft
-        type: string
-        required: false
-      - name: voyage_number
-        type: string
-        required: false
-      - name: terms_of_payment
-        type: string
-        required: true
-      - name: port_of_loading
-        type: string
-        required: true
-      - name: port_of_discharge
-        type: string
-        required: true
-      - name: place_of_dispatch
-        type: string
-        required: false
-      - name: place_of_destination
-        type: string
-        required: false
-      - name: marine_policy_number
-        type: string
-        required: false
-      - name: letter_of_credit_number
-        type: string
-        required: false
-      - name: incoterms
-        type: string
-        required: true
-      - name: bank_details
-        type: string
-        required: false
-      - name: items
-        type: array
-        required: true
       - name: total_amount
         type: currency
         required: true
     extraction_prompt: |
-      Extract from Commercial Invoice: Exporter, Importer, Country of Origin/Destination, 
-      Port of Loading/Discharge, Terms of Payment, Incoterms, Items, Total Amount.
-      Return JSON with all fields.
+      Extract from Commercial Invoice.
+      
+      KEYWORDS: "Commercial Invoice", "Invoice No", "Date", "Exporter", "Seller", "Importer", "Buyer", "Total Amount"
+      
+      TEXT:
+      {text}
+      
+      JSON:
+      {{"invoice_number": null, "date": null, "exporter_name": null, "importer_name": null, "total_amount": null}}
   
-  # Commercial - Classification Only
   - type: tax_invoice
     category: commercial
-    extract: false
+    extract: true
     description: "Tax invoice"
+    fields:
+      - name: invoice_number
+        type: string
+        required: true
+      - name: date
+        type: date
+        required: true
+      - name: seller_name
+        type: string
+        required: true
+      - name: buyer_name
+        type: string
+        required: true
+      - name: tax_amount
+        type: currency
+        required: false
+      - name: total_amount
+        type: currency
+        required: true
+    extraction_prompt: |
+      Extract from Tax Invoice: Invoice No, Date, Seller, Buyer, Tax, Total.
+      
+      TEXT: {text}
+      
+      JSON: {{"invoice_number": null, "date": null, "seller_name": null, "buyer_name": null, "tax_amount": null, "total_amount": null}}
   
   - type: debit_note
     category: commercial
-    extract: false
+    extract: true
     description: "Debit note"
+    fields:
+      - name: note_number
+        type: string
+        required: true
+      - name: date
+        type: date
+        required: true
+      - name: amount
+        type: currency
+        required: true
+    extraction_prompt: |
+      Extract from Debit Note: Note Number, Date, Amount.
+      
+      TEXT: {text}
+      
+      JSON: {{"note_number": null, "date": null, "amount": null}}
   
   - type: credit_note
     category: commercial
-    extract: false
+    extract: true
     description: "Credit note"
+    fields:
+      - name: note_number
+        type: string
+        required: true
+      - name: date
+        type: date
+        required: true
+      - name: amount
+        type: currency
+        required: true
+    extraction_prompt: |
+      Extract from Credit Note: Note Number, Date, Amount.
+      
+      TEXT: {text}
+      
+      JSON: {{"note_number": null, "date": null, "amount": null}}
   
   - type: cash_memo
     category: commercial
-    extract: false
+    extract: true
     description: "Cash memo"
+    fields:
+      - name: memo_number
+        type: string
+        required: true
+      - name: date
+        type: date
+        required: true
+      - name: amount
+        type: currency
+        required: true
+    extraction_prompt: |
+      Extract: Memo Number, Date, Amount.
+      
+      TEXT: {text}
+      
+      JSON: {{"memo_number": null, "date": null, "amount": null}}
   
   - type: mt103_swift
     category: commercial
-    extract: false
+    extract: true
     description: "MT103 SWIFT message"
+    fields:
+      - name: sender_reference
+        type: string
+        required: true
+      - name: date
+        type: date
+        required: true
+      - name: currency
+        type: string
+        required: true
+      - name: amount
+        type: currency
+        required: true
+    extraction_prompt: |
+      Extract from MT103 SWIFT: Sender Reference (Field 20), Date, Currency, Amount (Field 32A).
+      
+      TEXT: {text}
+      
+      JSON: {{"sender_reference": null, "date": null, "currency": null, "amount": null}}
   
   - type: mt202_swift
     category: commercial
-    extract: false
+    extract: true
     description: "MT202 SWIFT message"
+    fields:
+      - name: sender_reference
+        type: string
+        required: true
+      - name: date
+        type: date
+        required: true
+      - name: amount
+        type: currency
+        required: true
+    extraction_prompt: |
+      Extract from MT202: Reference, Date, Amount.
+      
+      TEXT: {text}
+      
+      JSON: {{"sender_reference": null, "date": null, "amount": null}}
   
   - type: packing_list
     category: commercial
-    extract: false
+    extract: true
     description: "Packing list"
+    fields:
+      - name: packing_list_number
+        type: string
+        required: true
+      - name: date
+        type: date
+        required: true
+      - name: total_packages
+        type: number
+        required: false
+    extraction_prompt: |
+      Extract: Packing List No, Date, Total Packages/Cartons.
+      
+      TEXT: {text}
+      
+      JSON: {{"packing_list_number": null, "date": null, "total_packages": null}}
   
   - type: weight_list
     category: commercial
-    extract: false
+    extract: true
     description: "Weight list"
+    fields:
+      - name: document_number
+        type: string
+        required: true
+      - name: date
+        type: date
+        required: true
+      - name: total_weight
+        type: number
+        required: false
+    extraction_prompt: |
+      Extract: Document No, Date, Total Weight (kg/lbs).
+      
+      TEXT: {text}
+      
+      JSON: {{"document_number": null, "date": null, "total_weight": null}}
   
   - type: contract
     category: commercial
-    extract: false
+    extract: true
     description: "Commercial contract"
+    fields:
+      - name: contract_number
+        type: string
+        required: true
+      - name: date
+        type: date
+        required: true
+      - name: party_a
+        type: string
+        required: true
+      - name: party_b
+        type: string
+        required: true
+    extraction_prompt: |
+      Extract: Contract No, Date, Party A (first party), Party B (second party).
+      
+      TEXT: {text}
+      
+      JSON: {{"contract_number": null, "date": null, "party_a": null, "party_b": null}}
   
   - type: certificate_of_origin
     category: commercial
-    extract: false
+    extract: true
     description: "Certificate of origin"
+    fields:
+      - name: certificate_number
+        type: string
+        required: true
+      - name: date
+        type: date
+        required: true
+      - name: exporter
+        type: string
+        required: true
+      - name: country_of_origin
+        type: string
+        required: true
+    extraction_prompt: |
+      Extract: Certificate No, Date, Exporter, Country of Origin.
+      
+      KEYWORDS: "Certificate of Origin", "Origin", Country name
+      
+      TEXT: {text}
+      
+      JSON: {{"certificate_number": null, "date": null, "exporter": null, "country_of_origin": null}}
   
   - type: gsp_certificate
     category: commercial
-    extract: false
-    description: "Generalized System of Preferences certificate"
+    extract: true
+    description: "GSP certificate"
+    fields:
+      - name: certificate_number
+        type: string
+        required: true
+      - name: date
+        type: date
+        required: true
+      - name: exporter
+        type: string
+        required: true
+    extraction_prompt: |
+      Extract: Certificate No, Date, Exporter.
+      
+      TEXT: {text}
+      
+      JSON: {{"certificate_number": null, "date": null, "exporter": null}}
   
   - type: inspection_certificate
     category: commercial
-    extract: false
+    extract: true
     description: "Inspection certificate"
+    fields:
+      - name: certificate_number
+        type: string
+        required: true
+      - name: date
+        type: date
+        required: true
+      - name: inspector
+        type: string
+        required: false
+    extraction_prompt: |
+      Extract: Certificate No, Inspection Date, Inspector/Agency.
+      
+      TEXT: {text}
+      
+      JSON: {{"certificate_number": null, "date": null, "inspector": null}}
   
   - type: fumigation_certificate
     category: commercial
-    extract: false
+    extract: true
     description: "Fumigation certificate"
+    fields:
+      - name: certificate_number
+        type: string
+        required: true
+      - name: date
+        type: date
+        required: true
+      - name: treatment_date
+        type: date
+        required: false
+    extraction_prompt: |
+      Extract: Certificate No, Issue Date, Treatment Date.
+      
+      TEXT: {text}
+      
+      JSON: {{"certificate_number": null, "date": null, "treatment_date": null}}
   
   - type: warranty_certificate
     category: commercial
-    extract: false
+    extract: true
     description: "Warranty certificate"
+    fields:
+      - name: certificate_number
+        type: string
+        required: true
+      - name: date
+        type: date
+        required: true
+      - name: valid_until
+        type: date
+        required: false
+    extraction_prompt: |
+      Extract: Certificate/Warranty No, Issue Date, Valid Until/Expiry.
+      
+      TEXT: {text}
+      
+      JSON: {{"certificate_number": null, "date": null, "valid_until": null}}
   
   - type: certificate_of_analysis
     category: commercial
-    extract: false
+    extract: true
     description: "Certificate of analysis"
+    fields:
+      - name: certificate_number
+        type: string
+        required: true
+      - name: date
+        type: date
+        required: true
+    extraction_prompt: |
+      Extract: Certificate No, Date.
+      
+      TEXT: {text}
+      
+      JSON: {{"certificate_number": null, "date": null}}
   
   - type: certificate_of_quality
     category: commercial
-    extract: false
+    extract: true
     description: "Certificate of quality"
+    fields:
+      - name: certificate_number
+        type: string
+        required: true
+      - name: date
+        type: date
+        required: true
+    extraction_prompt: |
+      Extract: Certificate No, Date.
+      
+      TEXT: {text}
+      
+      JSON: {{"certificate_number": null, "date": null}}
   
   - type: phytosanitary_certificate
     category: commercial
-    extract: false
+    extract: true
     description: "Phytosanitary certificate"
+    fields:
+      - name: certificate_number
+        type: string
+        required: true
+      - name: date
+        type: date
+        required: true
+      - name: issuing_authority
+        type: string
+        required: false
+    extraction_prompt: |
+      Extract: Certificate No, Date, Issuing Authority.
+      
+      TEXT: {text}
+      
+      JSON: {{"certificate_number": null, "date": null, "issuing_authority": null}}
   
   - type: iec_code_certificate
     category: commercial
-    extract: false
+    extract: true
     description: "IEC code certificate"
+    fields:
+      - name: iec_code
+        type: string
+        required: true
+      - name: date
+        type: date
+        required: true
+      - name: company_name
+        type: string
+        required: true
+    extraction_prompt: |
+      Extract: IEC Code (10-digit), Date, Company Name.
+      
+      TEXT: {text}
+      
+      JSON: {{"iec_code": null, "date": null, "company_name": null}}
   
   - type: shipping_bill
     category: commercial
-    extract: false
+    extract: true
     description: "Shipping bill"
+    fields:
+      - name: shipping_bill_number
+        type: string
+        required: true
+      - name: date
+        type: date
+        required: true
+      - name: exporter
+        type: string
+        required: true
+    extraction_prompt: |
+      Extract: Shipping Bill No, Date, Exporter Name.
+      
+      TEXT: {text}
+      
+      JSON: {{"shipping_bill_number": null, "date": null, "exporter": null}}
   
   - type: bill_of_entry
     category: commercial
-    extract: false
+    extract: true
     description: "Bill of entry"
+    fields:
+      - name: bill_of_entry_number
+        type: string
+        required: true
+      - name: date
+        type: date
+        required: true
+      - name: importer
+        type: string
+        required: true
+    extraction_prompt: |
+      Extract: Bill of Entry No, Date, Importer Name.
+      
+      TEXT: {text}
+      
+      JSON: {{"bill_of_entry_number": null, "date": null, "importer": null}}
   
   - type: export_import_license
     category: commercial
-    extract: false
+    extract: true
     description: "Export/Import license"
+    fields:
+      - name: license_number
+        type: string
+        required: true
+      - name: issue_date
+        type: date
+        required: true
+      - name: valid_until
+        type: date
+        required: false
+    extraction_prompt: |
+      Extract: License No, Issue Date, Valid Until.
+      
+      TEXT: {text}
+      
+      JSON: {{"license_number": null, "issue_date": null, "valid_until": null}}
   
   - type: sdf_form
     category: commercial
-    extract: false
+    extract: true
     description: "Statutory Declaration Form"
+    fields:
+      - name: form_number
+        type: string
+        required: true
+      - name: date
+        type: date
+        required: true
+    extraction_prompt: |
+      Extract: SDF No/Form No, Date.
+      
+      TEXT: {text}
+      
+      JSON: {{"form_number": null, "date": null}}
   
   - type: softex
     category: commercial
-    extract: false
+    extract: true
     description: "Software Export Declaration"
+    fields:
+      - name: softex_number
+        type: string
+        required: true
+      - name: date
+        type: date
+        required: true
+      - name: exporter
+        type: string
+        required: true
+    extraction_prompt: |
+      Extract: Softex No, Date, Exporter.
+      
+      TEXT: {text}
+      
+      JSON: {{"softex_number": null, "date": null, "exporter": null}}
   
   - type: high_seas_agreement
     category: commercial
-    extract: false
+    extract: true
     description: "High seas agreement"
+    fields:
+      - name: agreement_number
+        type: string
+        required: true
+      - name: date
+        type: date
+        required: true
+      - name: seller
+        type: string
+        required: true
+      - name: buyer
+        type: string
+        required: true
+    extraction_prompt: |
+      Extract: Agreement No, Date, Seller, Buyer.
+      
+      TEXT: {text}
+      
+      JSON: {{"agreement_number": null, "date": null, "seller": null, "buyer": null}}
   
   - type: shipping_guarantee
     category: commercial
-    extract: false
+    extract: true
     description: "Shipping guarantee"
+    fields:
+      - name: guarantee_number
+        type: string
+        required: true
+      - name: date
+        type: date
+        required: true
+    extraction_prompt: |
+      Extract: Guarantee No, Date.
+      
+      TEXT: {text}
+      
+      JSON: {{"guarantee_number": null, "date": null}}
   
   - type: sales_agreement
     category: commercial
-    extract: false
+    extract: true
     description: "Sales agreement"
+    fields:
+      - name: agreement_number
+        type: string
+        required: true
+      - name: date
+        type: date
+        required: true
+      - name: seller
+        type: string
+        required: true
+      - name: buyer
+        type: string
+        required: true
+    extraction_prompt: |
+      Extract: Agreement No, Date, Seller, Buyer.
+      
+      TEXT: {text}
+      
+      JSON: {{"agreement_number": null, "date": null, "seller": null, "buyer": null}}
   
   - type: promissory_note
     category: commercial
-    extract: false
+    extract: true
     description: "Promissory note"
+    fields:
+      - name: note_number
+        type: string
+        required: true
+      - name: date
+        type: date
+        required: true
+      - name: amount
+        type: currency
+        required: true
+      - name: maker
+        type: string
+        required: true
+      - name: payee
+        type: string
+        required: true
+    extraction_prompt: |
+      Extract: Note No, Date, Amount, Maker (who promises to pay), Payee (who receives).
+      
+      TEXT: {text}
+      
+      JSON: {{"note_number": null, "date": null, "amount": null, "maker": null, "payee": null}}
   
   - type: gr_waiver
     category: commercial
-    extract: false
+    extract: true
     description: "General Remittance Waiver"
+    fields:
+      - name: waiver_number
+        type: string
+        required: true
+      - name: date
+        type: date
+        required: true
+    extraction_prompt: |
+      Extract: Waiver No/GR No, Date.
+      
+      TEXT: {text}
+      
+      JSON: {{"waiver_number": null, "date": null}}
   
   # ============================================================
-  # TRANSPORT DOCUMENTS (10 total, 0 with extraction)
+  # TRANSPORT DOCUMENTS (10 total)
   # ============================================================
   
   - type: bill_of_lading
     category: transport
-    extract: false
+    extract: true
     description: "Bill of lading"
+    fields:
+      - name: bl_number
+        type: string
+        required: true
+      - name: date
+        type: date
+        required: true
+      - name: shipper
+        type: string
+        required: true
+      - name: consignee
+        type: string
+        required: true
+      - name: vessel
+        type: string
+        required: false
+      - name: port_of_loading
+        type: string
+        required: false
+      - name: port_of_discharge
+        type: string
+        required: false
+    extraction_prompt: |
+      Extract from Bill of Lading.
+      
+      KEYWORDS: "B/L No", "Bill of Lading", "Shipper", "Consignee", "Vessel", "Port of Loading", "Port of Discharge"
+      
+      TEXT: {text}
+      
+      JSON: {{"bl_number": null, "date": null, "shipper": null, "consignee": null, "vessel": null, "port_of_loading": null, "port_of_discharge": null}}
   
   - type: airway_bill
     category: transport
-    extract: false
+    extract: true
     description: "Airway bill"
+    fields:
+      - name: awb_number
+        type: string
+        required: true
+      - name: date
+        type: date
+        required: true
+      - name: shipper
+        type: string
+        required: true
+      - name: consignee
+        type: string
+        required: true
+      - name: flight_number
+        type: string
+        required: false
+    extraction_prompt: |
+      Extract from Airway Bill.
+      
+      KEYWORDS: "AWB No", "Air Waybill", "Shipper", "Consignee", "Flight"
+      
+      TEXT: {text}
+      
+      JSON: {{"awb_number": null, "date": null, "shipper": null, "consignee": null, "flight_number": null}}
   
   - type: multimodal_transport_document
     category: transport
-    extract: false
-    description: "Multimodal/Combined transport document"
+    extract: true
+    description: "Multimodal transport document"
+    fields:
+      - name: document_number
+        type: string
+        required: true
+      - name: date
+        type: date
+        required: true
+      - name: shipper
+        type: string
+        required: true
+      - name: consignee
+        type: string
+        required: true
+    extraction_prompt: |
+      Extract: Document No, Date, Shipper, Consignee.
+      
+      TEXT: {text}
+      
+      JSON: {{"document_number": null, "date": null, "shipper": null, "consignee": null}}
   
   - type: lorry_receipt
     category: transport
-    extract: false
+    extract: true
     description: "Lorry receipt"
+    fields:
+      - name: receipt_number
+        type: string
+        required: true
+      - name: date
+        type: date
+        required: true
+      - name: vehicle_number
+        type: string
+        required: false
+    extraction_prompt: |
+      Extract: Receipt No/LR No, Date, Vehicle Number.
+      
+      TEXT: {text}
+      
+      JSON: {{"receipt_number": null, "date": null, "vehicle_number": null}}
   
   - type: cmr
     category: transport
-    extract: false
-    description: "CMR - Convention on International Carriage of Goods by Road"
+    extract: true
+    description: "CMR transport document"
+    fields:
+      - name: cmr_number
+        type: string
+        required: true
+      - name: date
+        type: date
+        required: true
+    extraction_prompt: |
+      Extract: CMR No, Date.
+      
+      TEXT: {text}
+      
+      JSON: {{"cmr_number": null, "date": null}}
   
   - type: delivery_note
     category: transport
-    extract: false
+    extract: true
     description: "Delivery note"
+    fields:
+      - name: delivery_note_number
+        type: string
+        required: true
+      - name: date
+        type: date
+        required: true
+    extraction_prompt: |
+      Extract: Delivery Note No, Date.
+      
+      TEXT: {text}
+      
+      JSON: {{"delivery_note_number": null, "date": null}}
   
   - type: courier_receipt
     category: transport
-    extract: false
+    extract: true
     description: "Courier receipt"
+    fields:
+      - name: tracking_number
+        type: string
+        required: true
+      - name: date
+        type: date
+        required: true
+      - name: courier_company
+        type: string
+        required: false
+    extraction_prompt: |
+      Extract: Tracking No/Docket No, Date, Courier Company (FedEx/DHL/etc).
+      
+      TEXT: {text}
+      
+      JSON: {{"tracking_number": null, "date": null, "courier_company": null}}
   
   - type: postal_receipt
     category: transport
-    extract: false
+    extract: true
     description: "Postal receipt"
+    fields:
+      - name: receipt_number
+        type: string
+        required: true
+      - name: date
+        type: date
+        required: true
+    extraction_prompt: |
+      Extract: Receipt No, Date.
+      
+      TEXT: {text}
+      
+      JSON: {{"receipt_number": null, "date": null}}
   
   - type: seaway_bill
     category: transport
-    extract: false
+    extract: true
     description: "Seaway bill"
+    fields:
+      - name: seaway_bill_number
+        type: string
+        required: true
+      - name: date
+        type: date
+        required: true
+      - name: shipper
+        type: string
+        required: true
+      - name: consignee
+        type: string
+        required: true
+    extraction_prompt: |
+      Extract: Seaway Bill No, Date, Shipper, Consignee.
+      
+      TEXT: {text}
+      
+      JSON: {{"seaway_bill_number": null, "date": null, "shipper": null, "consignee": null}}
   
   # ============================================================
-  # INSURANCE DOCUMENTS (7 total, 0 with extraction)
+  # INSURANCE DOCUMENTS (7 total)
   # ============================================================
   
   - type: insurance_policy
     category: insurance
-    extract: false
+    extract: true
     description: "Insurance policy"
+    fields:
+      - name: policy_number
+        type: string
+        required: true
+      - name: date
+        type: date
+        required: true
+      - name: insured_party
+        type: string
+        required: true
+      - name: coverage_amount
+        type: currency
+        required: false
+      - name: premium
+        type: currency
+        required: false
+      - name: valid_from
+        type: date
+        required: false
+      - name: valid_until
+        type: date
+        required: false
+    extraction_prompt: |
+      Extract from Insurance Policy document.
+      
+      CRITICAL - SEARCH ENTIRE TEXT FOR:
+      1. Policy Number: Look for "Policy No", "Policy Number", "Policy #", "Certificate No"
+      2. Date: "Date", "Issue Date", "Policy Date"
+      3. Insured Party: "Insured", "Assured", "Policy Holder", "Name"
+      4. Coverage: "Sum Insured", "Coverage Amount", "Insured Amount"
+      5. Premium: "Premium", "Premium Amount"
+      6. Dates: "From", "To", "Valid from", "Valid until", "Period"
+      
+      DOCUMENT TEXT:
+      {text}
+      
+      RETURN THIS EXACT JSON STRUCTURE (replace null with actual values):
+      {{
+        "policy_number": null,
+        "date": null,
+        "insured_party": null,
+        "coverage_amount": null,
+        "premium": null,
+        "valid_from": null,
+        "valid_until": null
+      }}
+      
+      RULES:
+      - Search the ENTIRE text carefully
+      - Dates in YYYY-MM-DD format
+      - Currency as numbers only (no symbols)
+      - Use null for missing values
+      - Return ONLY the JSON, no other text
   
   - type: insurance_certificate
     category: insurance
-    extract: false
+    extract: true
     description: "Insurance certificate"
+    fields:
+      - name: certificate_number
+        type: string
+        required: true
+      - name: date
+        type: date
+        required: true
+      - name: insured_party
+        type: string
+        required: true
+      - name: coverage_amount
+        type: currency
+        required: false
+    extraction_prompt: |
+      Extract from Insurance Certificate.
+      
+      KEYWORDS: "Certificate No", "Date", "Insured", "Coverage", "Sum Insured"
+      
+      TEXT: {text}
+      
+      JSON: {{"certificate_number": null, "date": null, "insured_party": null, "coverage_amount": null}}
   
   - type: consignment_advice_insurance
     category: insurance
-    extract: false
-    description: "Consignment advice for insurance"
+    extract: true
+    description: "Consignment advice"
+    fields:
+      - name: advice_number
+        type: string
+        required: true
+      - name: date
+        type: date
+        required: true
+    extraction_prompt: |
+      Extract: Advice No, Date.
+      
+      TEXT: {text}
+      
+      JSON: {{"advice_number": null, "date": null}}
   
   - type: cover_note
     category: insurance
-    extract: false
-    description: "Insurance cover note"
+    extract: true
+    description: "Cover note"
+    fields:
+      - name: cover_note_number
+        type: string
+        required: true
+      - name: date
+        type: date
+        required: true
+    extraction_prompt: |
+      Extract: Cover Note No, Date.
+      
+      TEXT: {text}
+      
+      JSON: {{"cover_note_number": null, "date": null}}
   
   - type: marine_insurance
     category: insurance
-    extract: false
+    extract: true
     description: "Marine insurance"
+    fields:
+      - name: policy_number
+        type: string
+        required: true
+      - name: date
+        type: date
+        required: true
+      - name: insured_value
+        type: currency
+        required: false
+      - name: vessel
+        type: string
+        required: false
+    extraction_prompt: |
+      Extract from Marine Insurance.
+      
+      KEYWORDS: "Policy No", "Date", "Insured Value", "Vessel", "Ship"
+      
+      TEXT: {text}
+      
+      JSON: {{"policy_number": null, "date": null, "insured_value": null, "vessel": null}}
   
   - type: cargo_insurance
     category: insurance
-    extract: false
+    extract: true
     description: "Cargo insurance"
+    fields:
+      - name: policy_number
+        type: string
+        required: true
+      - name: date
+        type: date
+        required: true
+      - name: insured_value
+        type: currency
+        required: false
+    extraction_prompt: |
+      Extract: Policy No, Date, Insured Value.
+      
+      TEXT: {text}
+      
+      JSON: {{"policy_number": null, "date": null, "insured_value": null}}
   
   - type: customs_bond
     category: insurance
-    extract: false
+    extract: true
     description: "Customs bond"
+    fields:
+      - name: bond_number
+        type: string
+        required: true
+      - name: date
+        type: date
+        required: true
+      - name: bond_amount
+        type: currency
+        required: false
+    extraction_prompt: |
+      Extract: Bond No, Date, Bond Amount.
+      
+      TEXT: {text}
+      
+      JSON: {{"bond_number": null, "date": null, "bond_amount": null}}
   
   # ============================================================
   # FALLBACK
@@ -631,4 +1282,4 @@ documents:
   - type: other
     category: unknown
     extract: false
-    description: "Unrecognized or uncategorized document"
+    description: "Unrecognized document"

@@ -108,6 +108,14 @@ class DynamicExtractor:
                 system_prompt,
                 timeout=180
             )
+
+            # ADD THIS DEBUG
+            print("\n" + "="*70)
+            print("DEBUG: LLM RAW RESPONSE")
+            print("="*70)
+            print(f"Type: {type(result)}")
+            print(f"Content: {result}")
+            print("="*70 + "\n")
             
             # Validate and clean result
             validated_result = self._validate_extraction(result)
